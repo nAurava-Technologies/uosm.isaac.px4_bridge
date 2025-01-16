@@ -24,19 +24,25 @@ The project has been tested on **Ubuntu 22.04**.
 
 ## Getting Started
 
-1. Download and extract the ZIP folder from the release panel. Launch IsaacSim, navigate to **Window -> Extensions -> Settings**, and add a new Extension search path pointing to the extracted folder.
+1. Download and extract the ZIP folder from the release panel. 
+
+2. Launch IsaacSim, navigate to **Window -> Extensions -> Settings**, and add a new Extension search path pointing to the extracted folder.
+
+   <div style="background-color:rgba(192, 192, 192, 0.06); border-left: 4px solid rgba(255, 255, 0, 0.6); padding: 10px;">
+   <strong>Note:</strong> This extension is bundled with a pre-built px4_sitl_default (v1.15) and MicroXRCEAgent (v3.0). Users can use their own version by `export PX4_BINARY_PATH={usr-dir-to-px4}` and `export UXRCE_BINARY_PATH={usr-dir-to-MicroXRCEAgent}` in the terminal before launching isaac-sim.
+   </div>
 
    <img src="./media/extension.png" alt="Isaac Sim Extension Window">
 
-2. Set up the stage and scene. [Sample quadcopter models](./model) are provided. While the PX4 SITL operates in lockstep mode, the physics scene timestep should be between 200 and 400 (maximum in IsaacSim), depending on processing power and required physics accuracy. For multi-vehiicle setup, duplicate the vehicle and omnigraph nodes.
+3. Set up the stage and scene. [Sample quadcopter models](./model) are provided. While the PX4 SITL operates in lockstep mode, the physics scene timestep should be between 200 and 400 (maximum in IsaacSim), depending on processing power and required physics accuracy. For multi-vehiicle setup, duplicate the vehicle and omnigraph nodes.
 
    <img src="./media/physics_timestep.png" alt="Physics Timestep">
 
-3. Create the OmniGraph by selecting **Create -> Visual Scripting -> Action Graph** and configuring the nodes as shown. The Omni timeline playback rate will align with the physics rate configured in Step 2.
+4. Create the OmniGraph by selecting **Create -> Visual Scripting -> Action Graph** and configuring the nodes as shown. The Omni timeline playback rate will align with the physics rate configured in Step 2.
 
    <img src="./media/omnigraph_setup.png" alt="PX4 Bridge Omnigraph">
 
-4. For the `Stream_HIL_Sensor` node, adjust the rate of each built-in sensor to match the PX4 parameters. Use the Isaac Simulation Gate to set appropriate rates for other PX4 nodes. For instance:
+5. For the `Stream_HIL_Sensor` node, adjust the rate of each built-in sensor to match the PX4 parameters. Use the Isaac Simulation Gate to set appropriate rates for other PX4 nodes. For instance:
    - The `Stream_Heartbeat` node requires 1 Hz. If the physics rate is set to 250, set the Isaac Simulation Gate sample rate to 250.
    - The `Stream_HIL_GPS` node requires 10 Hz, so set the Isaac Simulation Gate sample rate to 25.
 
@@ -44,11 +50,11 @@ The project has been tested on **Ubuntu 22.04**.
 
    <img src="./media/hil_sensor_node.png" alt="PX4 HIL Sensor">
 
-5. Start the simulation by pressing the **SPACEBAR** or clicking the **Play** button in the main toolbar. The vehicle and PX4 state will reset upon stopping the simulation. Check the terminal to monitor the PX4 Autopilot and UXRCE agent running in the background.
+6. Start the simulation by pressing the **SPACEBAR** or clicking the **Play** button in the main toolbar. The vehicle and PX4 state will reset upon stopping the simulation. Check the terminal to monitor the PX4 Autopilot and UXRCE agent running in the background.
 
    <img src="./media/terminal_post_start.png" alt="Start Simulation">
 
-6. Open another terminal and run the `ros2 topic list` command to view the published `px4_msgs` topics.
+7. Open another terminal and run the `ros2 topic list` command to view the published `px4_msgs` topics.
 
    <img src="./media/ros2_topic_list.png" alt="ROS2 Terminal">
 
@@ -58,7 +64,7 @@ Follow our other [example](./example/README.md) to setup various SLAM algorithms
 
 ---
 
-## License and Disclaimert
+## License and Disclaimer
 
 This project is released under the [MIT License](./LICENSE).
 
@@ -74,11 +80,20 @@ The following tools, frameworks, and assets belong to their respective organizat
 ## Development Guide
 
 ```
+# Clone the main repository
 git clone https://github.com/NVIDIA-Omniverse/kit-extension-template-cpp.git
+
+# Navigate to the extensions directory
 cd kit-extension-template-cpp/source/extensions
+
+# Clone the PX4 Bridge repository
 git clone https://github.com/limshoonkit/uosm.isaac.px4_bridge.git
+
+# Initialize submodules
 cd uosm.isaac.px4_bridge
 git submodule update --init
+
+# Navigate back and build the project
 cd ../../../
 ./build.sh
 ```
@@ -86,20 +101,23 @@ cd ../../../
 - Note that the initial build may take some time as it downloads the Omniverse Kit SDKs.
 
 - As of writing, the kit-extension-template-cpp is currently on kit 106.5 which is intended for Isaac Sim v4.5 which is yet to be released.
-Follow the following for modification needed for Isaac Sim v4.2 https://github.com/NVIDIA-Omniverse/kit-extension-template-cpp/issues/13.
+For modifications required to use Isaac Sim v4.2, refer to the following: https://github.com/NVIDIA-Omniverse/kit-extension-template-cpp/issues/13.
 
 - The [make script](./premake5.lua) essentially build the Micro-XRCE-DDS-Agent and our custom fork of [PX4-Autopilot](https://github.com/limshoonkit/PX4-Autopilot).
 Reference from [PX4 Development Guide](https://docs.px4.io/main/en/dev_setup/dev_env_linux_ubuntu.html) and [eProsima Micro XRCE-DDS](https://micro-xrce-dds.docs.eprosima.com/en/latest/quickstart.html).
 
-- Common issue if there is multiple conflicting python installation https://github.com/PX4/PX4-Autopilot/issues/18413, you may require to manually make the px4_sitl
+- If there are conflicting Python installations, you may encounter build issues such as https://github.com/PX4/PX4-Autopilot/issues/18413. In such cases, you might need to manually build the px4_sitl target.
 
-Our PX4 fork itself added a new airframe class at PX4-Autopilot/ROMFS/px4fmu_common/init.d-posix/airframes/22000_isaacsim_s500 based on our custom model.
+- Our PX4 fork includes a new airframe class:
+`PX4-Autopilot/ROMFS/px4fmu_common/init.d-posix/airframes/22000_isaacsim_s500`,
+designed specifically for our custom model.
 
-To package for a release, reference https://github.com/NVIDIA-Omniverse/kit-extension-template-cpp
+To package the extension for release, run the following commands:
 ```
 cd kit-extension-template-cpp
 ./repo.sh package
 ```
+For more details, refer to https://github.com/NVIDIA-Omniverse/kit-extension-template-cpp
 
 ### Roadmap
 
