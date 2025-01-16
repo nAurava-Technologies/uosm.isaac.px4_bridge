@@ -1,0 +1,201 @@
+<robot name="dogpa" version="1.0">
+  <joint name="rotor_0" type="revolute">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.17202 -0.17022 0.04861"/>
+    <parent link="base_link"/>
+    <child link="rotor_0_link"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+  <joint name="rotor_1" type="revolute">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="-0.16623 0.16971 0.04861"/>
+    <parent link="base_link"/>
+    <child link="rotor_1_link"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+  <joint name="rotor_2" type="revolute">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.17403 0.16804 0.04890"/>
+    <parent link="base_link"/>
+    <child link="rotor_2_link"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+  <joint name="rotor_3" type="revolute">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="-0.16679 -0.16870 0.04890"/>
+    <parent link="base_link"/>
+    <child link="rotor_3_link"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+  <joint name="zedm_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.08650 0.00721 -0.03226"/>
+    <parent link="base_link"/>
+    <child link="zedm_link"/>
+  </joint>
+  <joint name="zedm_left_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.02062 0.02432 0.00028"/>
+    <parent link="zedm_link"/>
+    <child link="zedm_left_link"/>
+  </joint>
+  <joint name="zedm_right_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.02062 -0.03861 0.00027"/>
+    <parent link="zedm_link"/>
+    <child link="zedm_right_link"/>
+  </joint>
+  <link name="base_link">
+    <visual>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00009 0.00035 0.00884"/>
+      <material name="dogpa"/>
+      <geometry>
+        <mesh filename="./dogpa_meshes/dae/body.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00001 -0.00000 -0.00001"/>
+      <geometry>
+        <box size="0.38959 0.38884 0.14766"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <inertia ixx="0.01036" ixy="0.00001" ixz="-0.00031" iyy="0.01044" iyz="-0.00002" izz="0.01785"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00331 0.00035 0.00980"/>
+      <mass value="1.58000"/>
+    </inertial>
+  </link>
+  <link name="rotor_0_link">
+    <visual>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 -0.00000 0.00000"/>
+      <material name="prop"/>
+      <geometry>
+        <mesh filename="./dogpa_meshes/dae/prop1.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00000 -0.00000 -0.00000"/>
+      <geometry>
+        <cylinder length="0.006" radius="0.127"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <inertia ixx="0.00003" ixy="0.00002" ixz="-0.00000" iyy="0.00003" iyz="0.00000" izz="0.00004"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00001 -0.00006 -0.00033"/>
+      <mass value="0.01100"/>
+    </inertial>
+  </link>
+  <link name="rotor_1_link">
+    <visual>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 -0.00000 0.00000"/>
+      <material name="prop"/>
+      <geometry>
+        <mesh filename="./dogpa_meshes/dae/prop2.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0.00000 0.00000 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <geometry>
+        <cylinder length="0.006" radius="0.127"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <inertia ixx="0.00004" ixy="-0.00000" ixz="-0.00000" iyy="0.00001" iyz="-0.00000" izz="0.00004"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00003 -0.00005 -0.00035"/>
+      <mass value="0.01100"/>
+    </inertial>
+  </link>
+  <link name="rotor_2_link">
+    <visual>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00000 -0.00000 -0.00000"/>
+      <material name="prop"/>
+      <geometry>
+        <mesh filename="./dogpa_meshes/dae/prop3.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <geometry>
+        <cylinder length="0.006" radius="0.127"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <inertia ixx="0.00003" ixy="-0.00002" ixz="-0.00000" iyy="0.00002" iyz="-0.00000" izz="0.00004"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00014 0.00013 0.00035"/>
+      <mass value="0.01100"/>
+    </inertial>
+  </link>
+  <link name="rotor_3_link">
+    <visual>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <material name="prop"/>
+      <geometry>
+        <mesh filename="./dogpa_meshes/dae/prop4.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0.00000 0.00000 -0.00000" xyz="-0.00000 -0.00000 -0.00000"/>
+      <geometry>
+        <cylinder length="0.006" radius="0.127"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <inertia ixx="0.00004" ixy="0.00000" ixz="-0.00000" iyy="0.00001" iyz="0.00000" izz="0.00004"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00004 -0.00061 0.00036"/>
+      <mass value="0.01100"/>
+    </inertial>
+  </link>
+  <link name="zedm_left_link">
+    <sensor name="zedm_left_cam" type="camera">
+      <origin rpy="3.14159 -1.57080 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <parent link="zedm_left_link"/>
+      <camera>
+        <image>
+          <width>1080</width>
+          <height>720</height>
+          <hfov>1.57080</hfov>
+        </image>
+      </camera>
+    </sensor>
+    <inertial>
+      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <mass value="0.00001"/>
+    </inertial>
+  </link>
+  <link name="zedm_link">
+    <visual>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <material name="zedm"/>
+      <geometry>
+        <mesh filename="./dogpa_meshes/dae/zedm.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+    <inertial>
+      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <mass value="0.00001"/>
+    </inertial>
+  </link>
+  <link name="zedm_right_link">
+    <sensor name="zedm_right_cam" type="camera">
+      <origin rpy="3.14159 -1.57080 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <parent link="zedm_right_link"/>
+      <camera>
+        <image>
+          <width>1080</width>
+          <height>720</height>
+          <hfov>1.57080</hfov>
+        </image>
+      </camera>
+    </sensor>
+    <inertial>
+      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <mass value="0.00001"/>
+    </inertial>
+  </link>
+  <material name="prop">
+    <color rgba="0.00000 0.00000 0.00000 1.00000"/>
+  </material>
+  <material name="dogpa">
+    <texture filename="./dogpa_meshes/dae/dogpa_albedo.png"/>
+    <color rgba="0.80000 0.80000 0.80000 1.00000"/>
+  </material>
+  <material name="zedm">
+    <color rgba="0.00000 0.00000 0.00000 1.00000"/>
+  </material>
+</robot>

@@ -1,0 +1,28 @@
+[package]
+version = "0.1.0" # Semantic Versioning is used: https://semver.org/
+
+title = "PX4 Autopilot Bridge (Unofficial)"
+description = "PX4 Autopilot Bridge (Unofficial)"
+category = "Simulation"
+keywords = ["PX4", "Controller", "Multirotor", "OmniGraph"]
+changelog = "docs/CHANGELOG.md"
+readme = "docs/README.md"
+icon = "data/icon.png"
+preview_image = "data/preview.png"
+repository = "https://github.com/limshoonkit/uosm.isaac.px4_bridge"
+
+[dependencies]
+"omni.graph.core" = {}
+"omni.graph.tools" = {}
+
+[[python.module]]
+name = "uosm.isaac.px4_bridge"
+
+[[native.plugin]]
+path = "bin/*.plugin"
+
+[documentation]
+pages = [
+    "docs/Overview.md",
+    "docs/CHANGELOG.md",
+]

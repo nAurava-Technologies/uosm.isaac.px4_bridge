@@ -1,0 +1,7 @@
+[submodule "third_party/Micro-XRCE-DDS-Agent"]
+	path = third_party/Micro-XRCE-DDS-Agent
+	url = https://github.com/eProsima/Micro-XRCE-DDS-Agent.git
+[submodule "third_party/PX4-Autopilot"]
+	path = third_party/PX4-Autopilot
+	url = https://github.com/limshoonkit/PX4-Autopilot.git
+	branch = pr_sitl_isaacsim
