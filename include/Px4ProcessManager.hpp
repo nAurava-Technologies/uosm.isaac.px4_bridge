@@ -104,6 +104,23 @@ public:
         {
             const std::string ext_path = getExtPath();
             uxrce_agent_bin = ext_path + "/uxrce/MicroXRCEAgent";
+            // Set LD_LIBRARY_PATH
+            const char *current_ld_library_path = getenv("LD_LIBRARY_PATH");
+            std::string ld_library_path = ext_path + "/uxrce/temp_install/fastdds-3.1/lib:" +
+                                          ext_path + "/uxrce/temp_install/fastcdr-2.2.4/lib:" +
+                                          ext_path + "/uxrce/temp_install/microxrcedds_client-3.0.0/lib:" +
+                                          ext_path + "/uxrce/temp_install/microcdr-2.0.1/lib";
+
+            if (current_ld_library_path != nullptr)
+            {
+                ld_library_path = std::string(current_ld_library_path) + ":" + ld_library_path;
+            }
+
+            if (setenv("LD_LIBRARY_PATH", ld_library_path.c_str(), 1) != 0)
+            {
+                CARB_LOG_ERROR("Failed to set LD_LIBRARY_PATH");
+                return;
+            }
         }
 
         if (!std::filesystem::exists(uxrce_agent_bin))

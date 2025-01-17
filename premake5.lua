@@ -33,17 +33,13 @@ local function setup_xrce()
     -- Base install directory
     local install_base = build_dir.."/temp_install"
 
-    -- Directory for central symlinks
-    local symlink_dir = build_dir.."/libs"
-    ensure_directory(symlink_dir)
-
     -- If binary doesn't exist, build the agent
     if not path_exists(binary_path) then
         print("Building Micro-XRCE-DDS-Agent...")
         os.execute("cd "..script_path.."/third_party/Micro-XRCE-DDS-Agent && cmake -B build && cmake --build build -j$(nproc)")
 
         -- Set RPATH to temporary install directory
-        local rpath = "$ORIGIN:$ORIGIN/temp_install/fastcdr-2.2.4/lib:$ORIGIN/temp_install/fastdds-3.1/lib:$ORIGIN/temp_install/microcdr-2.0.1/lib"
+        local rpath = "$ORIGIN:$ORIGIN/temp_install/fastdds-3.1/lib:$ORIGIN/temp_install/fastcdr-2.2.4/lib:$ORIGIN/temp_install/microxrcedds_client-3.0.0/lib:$ORIGIN/temp_install/microcdr-2.0.1/lib"
         os.execute(string.format("patchelf --set-rpath '%s' %s", rpath, binary_path))
     else
         print("Micro-XRCE-DDS-Agent already built")
