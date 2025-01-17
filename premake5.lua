@@ -30,9 +30,26 @@ local function setup_xrce()
     ensure_directory(build_dir)
     local binary_path = build_dir.."/MicroXRCEAgent"
 
+    -- Base install directory
+    local install_base = build_dir.."/temp_install"
+
+    -- Directory for central symlinks
+    local symlink_dir = build_dir.."/libs"
+    ensure_directory(symlink_dir)
+
+    -- If binary doesn't exist, build the agent
     if not path_exists(binary_path) then
         print("Building Micro-XRCE-DDS-Agent...")
         os.execute("cd "..script_path.."/third_party/Micro-XRCE-DDS-Agent && cmake -B build && cmake --build build -j$(nproc)")
+
+        -- Find all .so files and create symlinks
+        print("Creating symbolic links for .so files...")
+        os.execute(string.format("find %s -name '*.so' -exec ln -sf {} %s \\;", install_base, symlink_dir))
+
+        -- Set RPATH to $ORIGIN:$ORIGIN/libs
+        local rpath = "$ORIGIN:$ORIGIN/libs"
+        print("Setting RPATH...")
+        os.execute(string.format("patchelf --set-rpath '%s' %s", rpath, binary_path))
     else
         print("Micro-XRCE-DDS-Agent already built")
     end

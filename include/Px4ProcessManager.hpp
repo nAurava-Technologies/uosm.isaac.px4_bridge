@@ -104,29 +104,6 @@ public:
         {
             const std::string ext_path = getExtPath();
             uxrce_agent_bin = ext_path + "/uxrce/MicroXRCEAgent";
-            // Set up library path
-            if (!isLdPathSet_)
-            {
-                std::string temp_install_path = ext_path + "/uxrce/temp_install";
-                std::string current_ld_path = getenv("LD_LIBRARY_PATH") ? getenv("LD_LIBRARY_PATH") : "";
-
-                // Construct new LD_LIBRARY_PATH with all required library directories
-                std::string new_ld_path =
-                    temp_install_path + "/microxrcedds_client-3.0.0/lib:" +
-                    temp_install_path + "/fastdds-3.1/lib:" +
-                    temp_install_path + "/fastcdr-2.2.4/lib:" +
-                    temp_install_path + "/microcdr-2.0.1/lib";
-
-                // Append to existing path if it exists
-                if (!current_ld_path.empty())
-                {
-                    new_ld_path += ":" + current_ld_path;
-                }
-
-                // Set the environment variable
-                setenv("LD_LIBRARY_PATH", new_ld_path.c_str(), 1);
-                isLdPathSet_ = true;
-            }
         }
 
         if (!std::filesystem::exists(uxrce_agent_bin))
@@ -302,7 +279,6 @@ private:
     static constexpr bool IS_STANDALONE{0};
     std::mutex mtx_;
     std::atomic<bool> isUxrceRunning_{false};
-    std::atomic<bool> isLdPathSet_{false};
 };
 
 } // px4

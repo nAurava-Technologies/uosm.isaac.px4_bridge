@@ -8,15 +8,15 @@ The project has been tested on **Ubuntu 22.04**.
 
 ### What You'll Find in This Repository:
 1. **C++ Omnigraph Interface**
-   
+
    A custom [Omnigraph Interface](https://docs.omniverse.nvidia.com/isaacsim/latest/gui_tutorials/tutorial_gui_omnigraph.html) that manages the lifecycle of PX4 SITL (Software In The Loop) simulation. Parameters for vehicle aerodynamics and sensor models, such as rotor constants, drag coefficients, and sensor noise, can be updated dynamically during runtime thorugh the omnigraph attributes panel.
 
 2. **ROS2 Humble Support**
-   
+
    The integration is achieved using a prebuilt Micro-XRCE-DDS-Agent binary and [px4_msgs](https://github.com/PX4/px4_msgs).
 
 3. **Quadcopter Assets**
-   
+
    The repository includes `.usd` [model](./model/) for a quadcopter platform based on the Holybro S500 development kit equipped with Nvidia Jetson Orin devices.
    Additionally, it is customizable with various [Sensor Assets](https://docs.omniverse.nvidia.com/isaacsim/latest/features/environment_setup/assets/usd_assets_sensors.html) readily available in Isaac Sim.
 
@@ -24,17 +24,21 @@ The project has been tested on **Ubuntu 22.04**.
 
 ## Getting Started
 
-1. Download and extract the ZIP folder from the release panel. 
+1. Download and extract the ZIP folder from the release panel.
 
 2. Launch IsaacSim, navigate to **Window -> Extensions -> Settings**, and add a new Extension search path pointing to the extracted folder.
 
-   <div style="background-color:rgba(192, 192, 192, 0.06); border-left: 4px solid rgba(255, 255, 0, 0.6); padding: 10px;">
+   <div style="background-color:rgba(192, 192, 192, 0.06); border-left: 4px solid rgba(0, 0, 255, 0.6); padding: 10px;">
    <strong>Note:</strong> This extension is bundled with a pre-built px4_sitl_default (v1.15) and MicroXRCEAgent (v3.0). Users can use their own version by `export PX4_BINARY_PATH={usr-dir-to-px4}` and `export UXRCE_BINARY_PATH={usr-dir-to-MicroXRCEAgent}` in the terminal before launching isaac-sim.
    </div>
 
    <img src="./media/extension.png" alt="Isaac Sim Extension Window">
 
-3. Set up the stage and scene. [Sample quadcopter models](./model) are provided. While the PX4 SITL operates in lockstep mode, the physics scene timestep should be between 200 and 400 (maximum in IsaacSim), depending on processing power and required physics accuracy. For multi-vehiicle setup, duplicate the vehicle and omnigraph nodes.
+3. Set up the stage and scene. [Sample quadcopter models](./model) are provided. While the PX4 SITL operates in lockstep mode, the physics timestep should be between 200 and 400, depending on processing power and required physics accuracy. Refer to [Configuring Frame Rate](https://docs.omniverse.nvidia.com/isaacsim/latest/simulation_fundamentals.html#configuring-frame-rate) for more detail.
+
+   <div style="background-color:rgba(192, 192, 192, 0.06); border-left: 4px solid rgba(255, 255, 0, 0.6); padding: 10px;">
+   <strong>Optional:</strong> While other physics and rendering settings can be kept to its default settings, it is advisable to make some adjustment according to https://docs.omniverse.nvidia.com/isaacsim/latest/reference_material/speedup_cheat_sheet.html
+   </div>
 
    <img src="./media/physics_timestep.png" alt="Physics Timestep">
 
@@ -46,7 +50,10 @@ The project has been tested on **Ubuntu 22.04**.
    - The `Stream_Heartbeat` node requires 1 Hz. If the physics rate is set to 250, set the Isaac Simulation Gate sample rate to 250.
    - The `Stream_HIL_GPS` node requires 10 Hz, so set the Isaac Simulation Gate sample rate to 25.
 
-   Additionally, ensure you specify the target vehicle prim to attach the node. A warning will appear if the vehicle is invalid or not found.
+   <div style="background-color:rgba(192, 192, 192, 0.06); border-left: 4px solid rgba(0, 0, 255, 0.6); padding: 10px;">
+   <strong>Note:</strong> Additionally, ensure you specify the target vehicle prim to attach the node. A warning will appear if the vehicle is invalid or not found.  For multi-vehicle setup, duplicate the vehicle and omnigraph nodes and set the appropriate vehicle prim and px4_instance index on the nodes.
+   </div>
+
 
    <img src="./media/hil_sensor_node.png" alt="PX4 HIL Sensor">
 
@@ -60,7 +67,7 @@ The project has been tested on **Ubuntu 22.04**.
 
 ### Whats next
 
-Follow our other [example](./example/README.md) to setup various SLAM algorithms and offboard ROS control or running in standalone python mode.  
+Follow our other [example](./example/README.md) to setup various SLAM algorithms and offboard ROS control or running in standalone python mode.
 
 ---
 
@@ -105,6 +112,19 @@ For modifications required to use Isaac Sim v4.2, refer to the following: https:
 
 - The [make script](./premake5.lua) essentially build the Micro-XRCE-DDS-Agent and our custom fork of [PX4-Autopilot](https://github.com/limshoonkit/PX4-Autopilot).
 Reference from [PX4 Development Guide](https://docs.px4.io/main/en/dev_setup/dev_env_linux_ubuntu.html) and [eProsima Micro XRCE-DDS](https://micro-xrce-dds.docs.eprosima.com/en/latest/quickstart.html).
+```
+# Following is required to set the correct runtime path for UXRCE Agent used in the .lua script
+sudo apt install patchelf
+
+# readelf -d MicroXRCEAgent
+
+# Dynamic section at offset 0x2d70 contains 30 entries:
+#  Tag        Type                         Name/Value
+# 0x0000000000000001 (NEEDED)             Shared library: [libmicroxrcedds_agent.so.3.0]
+# 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+# 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+# 0x000000000000001d (RUNPATH)            Library runpath: [$ORIGIN/libs]
+```
 
 - If there are conflicting Python installations, you may encounter build issues such as https://github.com/PX4/PX4-Autopilot/issues/18413. In such cases, you might need to manually build the px4_sitl target.
 
