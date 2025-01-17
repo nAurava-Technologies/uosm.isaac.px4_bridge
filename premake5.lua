@@ -42,13 +42,8 @@ local function setup_xrce()
         print("Building Micro-XRCE-DDS-Agent...")
         os.execute("cd "..script_path.."/third_party/Micro-XRCE-DDS-Agent && cmake -B build && cmake --build build -j$(nproc)")
 
-        -- Find all .so files and create symlinks
-        print("Creating symbolic links for .so files...")
-        os.execute(string.format("find %s -name '*.so' -exec ln -sf {} %s \\;", install_base, symlink_dir))
-
-        -- Set RPATH to $ORIGIN:$ORIGIN/libs
-        local rpath = "$ORIGIN:$ORIGIN/libs"
-        print("Setting RPATH...")
+        -- Set RPATH to temporary install directory
+        local rpath = "$ORIGIN:$ORIGIN/temp_install/fastcdr-2.2.4/lib:$ORIGIN/temp_install/fastdds-3.1/lib:$ORIGIN/temp_install/microcdr-2.0.1/lib"
         os.execute(string.format("patchelf --set-rpath '%s' %s", rpath, binary_path))
     else
         print("Micro-XRCE-DDS-Agent already built")

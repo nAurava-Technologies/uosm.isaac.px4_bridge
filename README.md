@@ -123,7 +123,7 @@ sudo apt install patchelf
 # 0x0000000000000001 (NEEDED)             Shared library: [libmicroxrcedds_agent.so.3.0]
 # 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
 # 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
-# 0x000000000000001d (RUNPATH)            Library runpath: [$ORIGIN/libs]
+# 0x000000000000001d (RUNPATH)            Library runpath: [$ORIGIN:$ORIGIN/temp_install/fastcdr-2.2.4/lib:$ORIGIN/temp_install/fastdds-3.1/lib:$ORIGIN/temp_install/microcdr-2.0.1/lib]
 ```
 
 - If there are conflicting Python installations, you may encounter build issues such as https://github.com/PX4/PX4-Autopilot/issues/18413. In such cases, you might need to manually build the px4_sitl target.
