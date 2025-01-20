@@ -34,13 +34,13 @@ The project has been tested on **Ubuntu 22.04**.
 
    <img src="./media/extension.png" alt="Isaac Sim Extension Window">
 
-3. Set up the stage and scene. [Sample quadcopter models](./model) are provided. While the PX4 SITL operates in lockstep mode, the physics timestep should be between 200 and 400, depending on processing power and required physics accuracy. Refer to [Configuring Frame Rate](https://docs.omniverse.nvidia.com/isaacsim/latest/simulation_fundamentals.html#configuring-frame-rate) for more detail.
+3. Set up the stage and scene. [Sample quadcopter models](./model) are provided. While the PX4 SITL operates in lockstep mode, the physics timestep should be between 200 and 400, depending on processing power and required physics accuracy. Refer to [Configuring Frame Rate](https://docs.omniverse.nvidia.com/isaacsim/latest/simulation_fundamentals.html#configuring-frame-rate) for more detail. The `Physics Scene Time Steps Per Second` of 200/250 and `Root Layer Time Codes Per Second` of 150/200 is a good inital selection for Synchronous Simulation and Rendering update.
 
    <div style="background-color:rgba(192, 192, 192, 0.06); border-left: 4px solid rgba(255, 255, 0, 0.6); padding: 10px;">
    <strong>Optional:</strong> While other physics and rendering settings can be kept to its default settings, it is advisable to make some adjustment according to https://docs.omniverse.nvidia.com/isaacsim/latest/reference_material/speedup_cheat_sheet.html
    </div>
 
-   <img src="./media/physics_timestep.png" alt="Physics Timestep">
+   <img src="./media/physics_timestep.png" alt="Physics & Render Timestep">
 
 4. Create the OmniGraph by selecting **Create -> Visual Scripting -> Action Graph** and configuring the nodes as shown. The Omni timeline playback rate will align with the physics rate configured in Step 2.
 
@@ -181,9 +181,13 @@ Maintainer: skl1g14@soton.ac.uk
    ```
 
 3. **Can I perform reinforcement learning with this setup?**
-
    ```
    You can deploy trained policies, as the PX4 SITL interface exposes position, velocity, or low-level actuator inputs via px4_msgs.
    Generally it is not recommended to add any ros or px4 system overhead during training.
    For parallel model-free training (e.g., PPO or SAC), consider workflows provided by [IsaacLab](https://isaac-sim.github.io/IsaacLab/main/index.html) or [Omnidrones](https://omnidrones.readthedocs.io/en/latest/).
+   ```
+
+4. **[RTPS_READER_HISTORY Error] Change payload size of '216' bytes is larger than the history payload size of '207' bytes and cannot be resized. -> Function can_change_be_added_nts**
+   ```
+   This is due to the different msg definition of px4_msgs with our custom for for PX4-Autopilot. Use https://github.com/Auterion/px4-ros2-interface-lib/blob/main/scripts/check-message-compatibility.py and checkout the proper px4_msgs commit version.
    ```

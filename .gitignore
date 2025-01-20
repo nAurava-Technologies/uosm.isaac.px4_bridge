@@ -1,5 +1,8 @@
 # Folder
-.vscode/*
+.vscode
 exts
+example/*/install/
+example/*/log/
+example/*/build/
 
 # File

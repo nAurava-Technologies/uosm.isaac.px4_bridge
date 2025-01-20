@@ -5,3 +5,9 @@
 	path = third_party/PX4-Autopilot
 	url = https://github.com/limshoonkit/PX4-Autopilot.git
 	branch = pr_sitl_isaacsim
+[submodule "example/ros2_offboard_ws/src/px4_msg"]
+	path = example/ros2_offboard_ws/src/px4_msg
+	url = https://github.com/PX4/px4_msgs.git
+[submodule "example/ros2_offboard_ws/src/px4_ros2_offboard"]
+	path = example/ros2_offboard_ws/src/px4_ros2_offboard
+	url = https://github.com/limshoonkit/px4_ros2_offboard.git
