@@ -2,7 +2,7 @@
 
 Welcome, and thank you for visiting this project!
 
-This tool is developed to aid in sim2real research for aerial robotics by combining **PX4** (v1.15) and **Isaac Sim** (v4.2).
+This tool is developed to aid in sim2real research for aerial robotics by combining **PX4** (v1.15) and **Isaac Sim** (v4.2 / v4.5).
 
 The project has been tested on **Ubuntu 22.04**.
 
@@ -107,11 +107,12 @@ cd ../../../
 
 - Note that the initial build may take some time as it downloads the Omniverse Kit SDKs.
 
-- As of writing, the kit-extension-template-cpp is currently on kit 106.5 which is intended for Isaac Sim v4.5 which is yet to be released.
+- ~~As of writing, the kit-extension-template-cpp is currently on kit 106.5 which is intended for Isaac Sim v4.5 which is yet to be released.~~
 For modifications required to use Isaac Sim v4.2, refer to the following: https://github.com/NVIDIA-Omniverse/kit-extension-template-cpp/issues/13.
 
 - The [make script](./premake5.lua) essentially build the Micro-XRCE-DDS-Agent and our custom fork of [PX4-Autopilot](https://github.com/limshoonkit/PX4-Autopilot).
 Reference from [PX4 Development Guide](https://docs.px4.io/main/en/dev_setup/dev_env_linux_ubuntu.html) and [eProsima Micro XRCE-DDS](https://micro-xrce-dds.docs.eprosima.com/en/latest/quickstart.html).
+
 ```
 # Following is required to set the correct runtime path for UXRCE Agent used in the .lua script
 sudo apt install patchelf
@@ -189,5 +190,5 @@ Maintainer: skl1g14@soton.ac.uk
 
 4. **[RTPS_READER_HISTORY Error] Change payload size of '216' bytes is larger than the history payload size of '207' bytes and cannot be resized. -> Function can_change_be_added_nts**
    ```
-   This is due to the different msg definition of px4_msgs with our custom for for PX4-Autopilot. Use https://github.com/Auterion/px4-ros2-interface-lib/blob/main/scripts/check-message-compatibility.py and checkout the proper px4_msgs commit version.
+   This is due to the different msg definition of px4_msgs with our custom fork for PX4-Autopilot. Use https://github.com/Auterion/px4-ros2-interface-lib/blob/main/scripts/check-message-compatibility.py and checkout the proper px4_msgs commit version.
    ```
