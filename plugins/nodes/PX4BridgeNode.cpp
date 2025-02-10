@@ -65,8 +65,14 @@ public:
                 vehicle_params.max_rotor_velocity = *static_cast<const float *>(value);
             if (attr.iAttribute->getNameToken(attr) == state::stdDev.token())
                 vehicle_params.params_std_dev = *static_cast<const float *>(value);
-            if (attr.iAttribute->getNameToken(attr) == state::tau.token())
-                vehicle_params.time_constants = *static_cast<const float *>(value);
+            if (attr.iAttribute->getNameToken(attr) == state::rotorTau.token())
+                vehicle_params.rotor_time_constants = *static_cast<const float *>(value);
+            if (attr.iAttribute->getNameToken(attr) == state::servoTau.token())
+                vehicle_params.servo_time_constants = *static_cast<const float *>(value);
+            if (attr.iAttribute->getNameToken(attr) == state::maxServoTorque.token())
+                vehicle_params.max_torque = *static_cast<const float *>(value);
+            if (attr.iAttribute->getNameToken(attr) == state::maxServoAngle.token())
+                vehicle_params.max_angle = *static_cast<const float *>(value);
             if (attr.iAttribute->getNameToken(attr) == state::rotorDrag.token())
                 vehicle_params.rotor_drag_coef = *static_cast<const usdrt::GfVec3f *>(value);
             if (attr.iAttribute->getNameToken(attr) == state::airframeDrag.token())
@@ -89,7 +95,10 @@ public:
         initializeAttribute(state::kf.token(), omni::fabric::BaseDataType::eFloat, &vehicle_params.force_constants);
         initializeAttribute(state::maxVel.token(), omni::fabric::BaseDataType::eFloat, &vehicle_params.max_rotor_velocity);
         initializeAttribute(state::stdDev.token(), omni::fabric::BaseDataType::eFloat, &vehicle_params.params_std_dev);
-        initializeAttribute(state::tau.token(), omni::fabric::BaseDataType::eFloat, &vehicle_params.time_constants);
+        initializeAttribute(state::rotorTau.token(), omni::fabric::BaseDataType::eFloat, &vehicle_params.rotor_time_constants);
+        initializeAttribute(state::servoTau.token(), omni::fabric::BaseDataType::eFloat, &vehicle_params.servo_time_constants);
+        initializeAttribute(state::maxServoTorque.token(), omni::fabric::BaseDataType::eFloat, &vehicle_params.max_torque);
+        initializeAttribute(state::maxServoAngle.token(), omni::fabric::BaseDataType::eFloat, &vehicle_params.max_angle);
         initializeAttribute(state::rotorDrag.token(), omni::fabric::BaseDataType::eFloat, &vehicle_params.rotor_drag_coef);
         initializeAttribute(state::airframeDrag.token(), omni::fabric::BaseDataType::eFloat, &vehicle_params.airframe_drag);
 
@@ -166,7 +175,11 @@ public:
         if (!state.m_vehicle->isVehiclePathEqual(vehiclePath))
         {
             state.m_vehicle->loadVehicle(vehiclePath);
-            state.m_throttle = std::vector<float>(state.m_vehicle->getRotorCount(), 0.0f);
+            if(state.m_vehicle->getRotorCount() + state.m_vehicle->getActuatorCount() > 16)
+            {
+                CARB_LOG_WARN("Vehicle actuator size over limit of 16, rotor(%ld), actuator(%ld)", state.m_vehicle->getRotorCount(), state.m_vehicle->getActuatorCount());
+                return false;
+            }
             state.m_airframe = state.m_vehicle->getAirframeConfig(db.tokenToString(airframe));
             if (state.m_airframe.size() != state.m_vehicle->getRotorCount())
             {
@@ -184,9 +197,8 @@ public:
             return false;
         }
 
-        std::vector<float> actuator_control(state.m_vehicle->getRotorCount(), 0.0f);
-        state.parse_mavlink_message(receive_buffer.data(), bytes_received, actuator_control);
-        state.m_vehicle->computeDynamics(actuator_control, state.m_throttle, state.m_airframe);
+        state.parse_mavlink_message(receive_buffer.data(), bytes_received, state.m_actuator_control);
+        state.m_vehicle->computeDynamics(state.m_actuator_control, state.m_airframe);
         return true;
     }
 
@@ -196,8 +208,9 @@ private:
     std::atomic<bool> isPX4Running_{false};
     std::vector<float> m_throttle;
     std::vector<int> m_airframe;
+    Px4Multirotor::ActuatorControl m_actuator_control;
 
-    void parse_mavlink_message(const uint8_t *buffer, size_t length, std::vector<float> &control)
+    void parse_mavlink_message(const uint8_t *buffer, size_t length, Px4Multirotor::ActuatorControl &m_actuator_control)
     {
         mavlink_message_t msg;
         mavlink_status_t status;
@@ -237,9 +250,14 @@ private:
                 case MAVLINK_MSG_ID_HIL_ACTUATOR_CONTROLS:
                 {
                     // https://mavlink.io/en/messages/common.html#HIL_ACTUATOR_CONTROLS
-                    mavlink_hil_actuator_controls_t actuator_controls;
-                    mavlink_msg_hil_actuator_controls_decode(&msg, &actuator_controls);
-                    std::copy_n(actuator_controls.controls, control.size(), control.begin());
+                    mavlink_hil_actuator_controls_t mavlink_controls;
+                    mavlink_msg_hil_actuator_controls_decode(&msg, &mavlink_controls);
+                    std::copy_n(mavlink_controls.controls, m_actuator_control.actuator_cmd.size(), m_actuator_control.actuator_cmd.begin());
+                    // printf("HIL_ACTUATOR_CONTROLS - Actuator controls: %f, %f, %f, %f, %f, %f, %f, %f \t %f, %f, %f, %f, %f, %f, %f, %f\n",
+                    //        actuator_controls.controls[0], actuator_controls.controls[1], actuator_controls.controls[2], actuator_controls.controls[3],
+                    //        actuator_controls.controls[4], actuator_controls.controls[5], actuator_controls.controls[6], actuator_controls.controls[7],
+                    //        actuator_controls.controls[8], actuator_controls.controls[9], actuator_controls.controls[10], actuator_controls.controls[11],
+                    //        actuator_controls.controls[12], actuator_controls.controls[13], actuator_controls.controls[14], actuator_controls.controls[15]);
                     break;
                 }
                 default:

@@ -1,0 +1,306 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"  name="oxpa">
+  <xacro:property name="package_path" value="$(find uosm_robot_viewer)"/>
+
+  <!--Joint-->
+  <joint name="actuator_0_joint" type="revolute">
+    <dynamics damping="1000.00000"/>
+    <limit lower="-1.57000" upper="1.57000" effort="0.11000" velocity="0.00000"/>
+    <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00022 0.02876 -0.09228"/>
+    <parent link="base_link"/>
+    <child link="actuator_0_link"/>
+    <axis xyz="1.00000 0.00000 0.00000"/>
+  </joint>
+  <joint name="actuator_1_joint" type="revolute">
+    <dynamics damping="1000.00000"/>
+    <limit lower="-1.57000" upper="1.57000" effort="0.11000" velocity="0.00000"/>
+    <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00056 -0.02866 -0.09218"/>
+    <parent link="base_link"/>
+    <child link="actuator_1_link"/>
+    <axis xyz="1.00000 0.00000 0.00000"/>
+  </joint>
+  <joint name="camera_left_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.00062 0.06129 -0.02874"/>
+    <parent link="base_link"/>
+    <child link="camera_left_link"/>
+  </joint>
+  <joint name="camera_right_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.00055 -0.06096 -0.02871"/>
+    <parent link="base_link"/>
+    <child link="camera_right_link"/>
+  </joint>
+  <joint name="oak_d_base_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.09562 0.00003 -0.04740"/>
+    <parent link="base_link"/>
+    <child link="oak_d_base_frame"/>
+  </joint>
+  <joint name="oak_d_imu_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00596 -0.03738 0.00323"/>
+    <parent link="oak_d_base_frame"/>
+    <child link="oak_d_imu_frame"/>
+  </joint>
+  <joint name="oak_d_left_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00000 0.03753 0.00000"/>
+    <parent link="oak_d_base_frame"/>
+    <child link="oak_d_left_frame"/>
+  </joint>
+  <joint name="oak_d_rgb_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+    <parent link="oak_d_base_frame"/>
+    <child link="oak_d_rgb_frame"/>
+  </joint>
+  <joint name="oak_d_right_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 -0.03747 0.00000"/>
+    <parent link="oak_d_base_frame"/>
+    <child link="oak_d_right_frame"/>
+  </joint>
+  <joint name="rotor_0_joint" type="revolute">
+    <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.17281 -0.17000 0.04217"/>
+    <parent link="base_link"/>
+    <child link="rotor_0_link"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+  <joint name="rotor_1_joint" type="revolute">
+    <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
+    <origin rpy="0.00000 0.00000 0.00000" xyz="-0.16699 0.17000 0.04217"/>
+    <parent link="base_link"/>
+    <child link="rotor_1_link"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+  <joint name="rotor_2_joint" type="revolute">
+    <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.17301 0.17000 0.04217"/>
+    <parent link="base_link"/>
+    <child link="rotor_2_link"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+  <joint name="rotor_3_joint" type="revolute">
+    <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
+    <origin rpy="0.00000 0.00000 0.00000" xyz="-0.16699 -0.17000 0.04217"/>
+    <parent link="base_link"/>
+    <child link="rotor_3_link"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+
+  <!--Link-->
+  <link name="actuator_0_link">
+    <visual name="actuator_0">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <material name="gripper"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/oxpa_meshes/dae/actuator_0.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="actuator_1_link">
+    <visual name="actuator_1">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <material name="gripper"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/oxpa_meshes/dae/actuator_1.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="base_link">
+    <inertial>
+      <inertia ixx="0.02504" ixy="0.00000" ixz="0.00000" iyy="0.02498" iyz="0.00000" izz="0.04654"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <mass value="1.86000"/>
+    </inertial>
+    <visual name="body">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00148 0.00226 -0.01761"/>
+      <material name="body"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/oxpa_meshes/dae/body.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+    <collision name= "body_collision">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 -0.0200"/>
+      <geometry>
+        <box size="0.38959 0.38884 0.1800"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="camera_left_link">
+    <sensor name="arducam_left" type="camera">
+      <origin rpy="-2.09440 0.00000 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <parent link="camera_left_link"/>
+      <camera>
+        <image>
+          <width>1080</width>
+          <height>720</height>
+          <hfov>1.57080</hfov>
+        </image>
+      </camera>
+    </sensor>
+    <visual name="camera_left">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00002 0.00101 0.00062"/>
+      <material name="camera"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/oxpa_meshes/dae/camera_left.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="camera_right_link">
+    <sensor name="arducam_right" type="camera">
+      <origin rpy="2.09440 -0.00000 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <parent link="camera_right_link"/>
+      <camera>
+        <image>
+          <width>1080</width>
+          <height>720</height>
+          <hfov>1.57080</hfov>
+        </image>
+      </camera>
+    </sensor>
+    <visual name="camera_right">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00002 0.00101 0.00062"/>
+      <material name="camera"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/oxpa_meshes/dae/camera_right.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="oak_d_base_frame">
+    <visual name="oak-d-lite">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00009 0.00009 -0.00016"/>
+      <material name="camera"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/oxpa_meshes/dae/oak-d-lite.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="oak_d_imu_frame"/>
+  <link name="oak_d_left_frame">
+    <sensor name="oak_d_left" type="camera">
+      <origin rpy="-3.14159 -1.04720 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <parent link="oak_d_left_frame"/>
+      <camera>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <hfov>1.57080</hfov>
+        </image>
+      </camera>
+    </sensor>
+  </link>
+  <link name="oak_d_rgb_frame">
+    <sensor name="oak_d_rgb" type="camera">
+      <origin rpy="-3.14159 -1.04720 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <parent link="oak_d_rgb_frame"/>
+      <camera>
+        <image>
+          <width>1080</width>
+          <height>720</height>
+          <hfov>1.57080</hfov>
+        </image>
+      </camera>
+    </sensor>
+  </link>
+  <link name="oak_d_right_frame">
+    <sensor name="oak_d_right" type="camera">
+      <origin rpy="-3.14159 -1.04720 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <parent link="oak_d_right_frame"/>
+      <camera>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <hfov>1.57080</hfov>
+        </image>
+      </camera>
+    </sensor>
+  </link>
+  <link name="rotor_0_link">
+    <inertial>
+      <inertia ixx="0.00009" ixy="0.00000" ixz="0.00000" iyy="0.00009" iyz="0.00000" izz="0.00018"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00001 0.00006 -0.00033"/>
+      <mass value="0.01100"/>
+    </inertial>
+    <visual name="rotor_0">
+      <origin rpy="-0.00000 0.00000 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <material name="prop"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/oxpa_meshes/dae/rotor0.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+    <collision name="rotor_0_collision">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <geometry>
+        <cylinder length="0.006" radius="0.127"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="rotor_1_link">
+    <inertial>
+      <inertia ixx="0.00009" ixy="0.00000" ixz="0.00000" iyy="0.00009" iyz="0.00000" izz="0.00018"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00003 0.00005 -0.00035"/>
+      <mass value="0.01100"/>
+    </inertial>
+    <visual name="rotor_1">
+      <origin rpy="-0.00000 0.00000 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <material name="prop"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/oxpa_meshes/dae/rotor1.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+    <collision name="rotor_1_collision">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 -0.00000 0.00000"/>
+      <geometry>
+        <cylinder length="0.006" radius="0.127"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="rotor_2_link">
+    <inertial>
+      <inertia ixx="0.00009" ixy="0.00000" ixz="0.00000" iyy="0.00009" iyz="0.00000" izz="0.00018"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00014 -0.00013 0.00035"/>
+      <mass value="0.01100"/>
+    </inertial>
+    <visual name="rotor_2">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <material name="prop"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/oxpa_meshes/dae/rotor2.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+    <collision name="rotor_2_collision">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <geometry>
+        <cylinder length="0.006" radius="0.127"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="rotor_3_link">
+    <inertial>
+      <inertia ixx="0.00009" ixy="0.00000" ixz="0.00000" iyy="0.00009" iyz="0.00000" izz="0.00018"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00004 0.00061 0.00036"/>
+      <mass value="0.01100"/>
+    </inertial>
+    <visual name="rotor_3">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <material name="prop"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/oxpa_meshes/dae/rotor3.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+    <collision name="rotor_3_collision">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 -0.00000 0.00000"/>
+      <geometry>
+        <cylinder length="0.006" radius="0.127"/>
+      </geometry>
+    </collision>
+  </link>
+  <material name="body">
+    <texture filename="file://${package_path}/urdf/oxpa_meshes/dae/body-albedo.png"/>
+  </material>
+  <material name="camera">
+    <texture filename="file://${package_path}/urdf/oxpa_meshes/dae/camera-albedo.png"/>
+  </material>
+  <material name="gripper">
+    <texture filename="file://${package_path}/urdf/oxpa_meshes/dae/gripper-albedo.png"/>
+  </material>
+  <material name="prop">
+    <color rgba="0.00000 0.00000 0.00000 1.00000"/>
+  </material>
+</robot>

@@ -84,9 +84,33 @@
                 }
             },
 
-            "tau": {
+            "maxServoTorque": {
                 "type": "float",
-                "description": "Throttle time constant",
+                "description": "Maximum servo torque value",
+                "metadata": {
+                    "hidden": "true"
+                }
+            },
+
+            "maxServoAngle": {
+                "type" : "float",
+                "description" : "Maximum servo angle",
+                "metadata": {
+                    "hidden": "true"
+                }
+            },
+
+            "rotorTau": {
+                "type": "float",
+                "description": "Rotor time constant",
+                "metadata": {
+                    "hidden": "true"
+                }
+            },
+
+            "servoTau": {
+                "type": "float",
+                "description": "Servo time constant",
                 "metadata": {
                     "hidden": "true"
                 }

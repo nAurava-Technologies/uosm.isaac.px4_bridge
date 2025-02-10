@@ -129,7 +129,7 @@ public:
         // Sanitize inputs
         if (vehicle_in.empty())
         {
-            CARB_LOG_WARN("StreamHILGPSNode at %s has no vehicle input!", db.abi_node().iNode->getPrimPath(db.abi_node()));
+            CARB_LOG_WARN("No vehicle input at %s", db.abi_node().iNode->getPrimPath(db.abi_node()));
             return false;
         }
         if (time <= 0)

@@ -1,0 +1,291 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"  name="dogpa_vl">
+  <xacro:property name="package_path" value="$(find uosm_robot_viewer)"/>
+
+  <!--Joint-->
+  <joint name="rotor_0" type="revolute">
+    <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.17202 -0.17022 0.04861"/>
+    <parent link="base_link"/>
+    <child link="rotor_0_link"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+  <joint name="rotor_1" type="revolute">
+    <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
+    <origin rpy="0.00000 0.00000 0.00000" xyz="-0.16623 0.16971 0.04861"/>
+    <parent link="base_link"/>
+    <child link="rotor_1_link"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+  <joint name="rotor_2" type="revolute">
+    <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.17403 0.16804 0.04890"/>
+    <parent link="base_link"/>
+    <child link="rotor_2_link"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+  <joint name="rotor_3" type="revolute">
+    <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
+    <origin rpy="0.00000 0.00000 0.00000" xyz="-0.16679 -0.16870 0.04890"/>
+    <parent link="base_link"/>
+    <child link="rotor_3_link"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+  <joint name="rplidar_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 -1.57054" xyz="-0.00300 0.00000 0.07000"/>
+    <parent link="base_link"/>
+    <child link="rplidar_s1_link"/>
+  </joint>
+  <joint name="usbcam_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.05137 -0.00232 0.07916"/>
+    <parent link="base_link"/>
+    <child link="usbcam_link"/>
+  </joint>
+  <joint name="zedm_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.08650 0.00721 -0.03226"/>
+    <parent link="base_link"/>
+    <child link="zedm_link"/>
+  </joint>
+  <joint name="zedm_left_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.02062 0.02432 0.00028"/>
+    <parent link="zedm_link"/>
+    <child link="zedm_left_link"/>
+  </joint>
+  <joint name="zedm_right_joint" type="fixed">
+    <origin rpy="0.00000 0.00000 0.00000" xyz="0.02062 -0.03861 0.00027"/>
+    <parent link="zedm_link"/>
+    <child link="zedm_right_link"/>
+  </joint>
+  <link name="base_link">
+    <collision name="body_collision">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00001 -0.00000 -0.00001"/>
+      <geometry>
+        <box size="0.38959 0.38884 0.14766"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <inertia ixx="0.01116" ixy="0.00001" ixz="-0.00018" iyy="0.01118" iyz="-0.00004" izz="0.01942"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00516 0.00041 0.01135"/>
+      <mass value="1.68200"/>
+    </inertial>
+    <visual name="body">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00009 0.00035 0.00884"/>
+      <material name="s500"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/dogpa_vl_meshes/dae/body.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="rotor_0_link">
+    <collision name="rotor_0_collision">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <geometry>
+        <cylinder length="0.006" radius="0.127"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <inertia ixx="0.00009" ixy="0.00000" ixz="0.00000" iyy="0.00009" iyz="0.00000" izz="0.00018"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00001 -0.00006 -0.00033"/>
+      <mass value="0.01100"/>
+    </inertial>
+    <visual name="rotor_0">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 -0.00000 0.00000"/>
+      <material name="prop"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/dogpa_vl_meshes/dae/prop1.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="rotor_1_link">
+    <collision name="rotor_1_collision">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <geometry>
+        <cylinder length="0.006" radius="0.127"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <inertia ixx="0.00009" ixy="0.00000" ixz="0.00000" iyy="0.00009" iyz="0.00000" izz="0.00018"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00003 -0.00005 -0.00035"/>
+      <mass value="0.01100"/>
+    </inertial>
+    <visual name="rotor_1">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 -0.00000 0.00000"/>
+      <material name="prop"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/dogpa_vl_meshes/dae/prop2.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="rotor_2_link">
+    <collision name="rotor_2_collision">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <geometry>
+        <cylinder length="0.006" radius="0.127"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <inertia ixx="0.00009" ixy="0.00000" ixz="0.00000" iyy="0.00009" iyz="0.00000" izz="0.00018"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00014 0.00013 0.00035"/>
+      <mass value="0.01100"/>
+    </inertial>
+    <visual name="rotor_2">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00000 -0.00000 -0.00000"/>
+      <material name="prop"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/dogpa_vl_meshes/dae/prop3.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="rotor_3_link">
+    <collision name="rotor_3_collision">
+      <origin rpy="0.00000 0.00000 -0.00000" xyz="-0.00000 -0.00000 -0.00000"/>
+      <geometry>
+        <cylinder length="0.006" radius="0.127"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <inertia ixx="0.00009" ixy="0.00000" ixz="0.00000" iyy="0.00009" iyz="0.00000" izz="0.00018"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00004 -0.00061 0.00036"/>
+      <mass value="0.01100"/>
+    </inertial>
+    <visual name="rotor_3">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <material name="prop"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/dogpa_vl_meshes/dae/prop4.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="rplidar_s1_link">
+    <inertial>
+      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <mass value="0.00001"/>
+    </inertial>
+    <collision name="lidar_collision">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00001 -0.00000 0.025"/>
+      <geometry>
+        <box size="0.05 0.05 0.05"/>
+      </geometry>
+    </collision>
+    <sensor name="plannar_lidar" type="lidar">
+      <parent link="rplidar_s1_link"/>
+      <ray>
+        <scan>
+          <horizontal>
+            <min_angle>0</min_angle>
+            <max_angle>360</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>1000</samples>
+            <min_angle>1</min_angle>
+            <max_angle>1</max_angle>
+            <resolution>0.0068242374</resolution>
+          </vertical>
+        </scan>
+        <range>
+          <max>40.00000</max>
+        </range>
+      </ray>
+    </sensor>
+    <visual name="rplidar_s1">
+      <origin rpy="0.00000 0.00000 1.57054" xyz="0.00015 -0.00015 0.01836"/>
+      <material name="rplidar"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/dogpa_vl_meshes/dae/rplidar_s1m1_r1.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="usbcam_link">
+    <sensor name="usb_mono_cam" type="camera">
+      <origin rpy="0.00000 0.78540 0.00000" xyz="0.01182 0.00000 0.01114"/>
+      <parent link="usbcam_link"/>
+      <camera>
+        <image>
+          <width>1920</width>
+          <height>1080</height>
+          <hfov>1.57080</hfov>
+        </image>
+      </camera>
+    </sensor>
+    <inertial>
+      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <mass value="0.00001"/>
+    </inertial>
+    <visual name="usbcam">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 -0.00000 0.00000"/>
+      <material name="usbcam"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/dogpa_vl_meshes/dae/usbcam.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="zedm_left_link">
+    <sensor name="zedm_left_cam" type="camera">
+      <origin rpy="3.14159 -1.57080 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <parent link="zedm_left_link"/>
+      <camera>
+        <image>
+          <width>1080</width>
+          <height>720</height>
+          <hfov>1.57080</hfov>
+        </image>
+      </camera>
+    </sensor>
+    <inertial>
+      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <mass value="0.00001"/>
+    </inertial>
+  </link>
+  <link name="zedm_link">
+    <inertial>
+      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <mass value="0.00001"/>
+    </inertial>
+    <visual name="zedm">
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <material name="zedm"/>
+      <geometry>
+        <mesh filename="file://${package_path}/urdf/dogpa_vl_meshes/dae/zedm.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="zedm_right_link">
+    <sensor name="zedm_right_cam" type="camera">
+      <origin rpy="3.14159 -1.57080 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <parent link="zedm_right_link"/>
+      <camera>
+        <image>
+          <width>1080</width>
+          <height>720</height>
+          <hfov>1.57080</hfov>
+        </image>
+      </camera>
+    </sensor>
+    <inertial>
+      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <mass value="0.00001"/>
+    </inertial>
+  </link>
+  <material name="prop">
+    <color rgba="0.00000 0.00000 0.00000 1.00000"/>
+  </material>
+  <material name="rplidar">
+    <color rgba="0.00000 0.00000 0.00000 1.00000"/>
+  </material>
+  <material name="s500">
+    <texture filename="file://${package_path}/urdf/dogpa_vl_meshes/dae/dogpa_albedo.png"/>
+    <color rgba="0.80000 0.80000 0.80000 1.00000"/>
+  </material>
+  <material name="usbcam">
+    <texture filename="file://${package_path}/urdf/dogpa_vl_meshes/dae/usbcam.png"/>
+    <color rgba="0.80000 0.80000 0.80000 1.00000"/>
+  </material>
+  <material name="zedm">
+    <color rgba="0.00000 0.00000 0.00000 1.00000"/>
+  </material>
+</robot>

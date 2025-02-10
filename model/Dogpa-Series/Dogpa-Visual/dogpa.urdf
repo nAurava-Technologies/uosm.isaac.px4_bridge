@@ -73,7 +73,7 @@
       </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.00003" ixy="0.00002" ixz="-0.00000" iyy="0.00003" iyz="0.00000" izz="0.00004"/>
+      <inertia ixx="0.00009" ixy="0.00000" ixz="0.00000" iyy="0.00009" iyz="0.00000" izz="0.00018"/>
       <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00001 -0.00006 -0.00033"/>
       <mass value="0.01100"/>
     </inertial>
@@ -93,7 +93,7 @@
       </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.00004" ixy="-0.00000" ixz="-0.00000" iyy="0.00001" iyz="-0.00000" izz="0.00004"/>
+      <inertia ixx="0.00009" ixy="0.00000" ixz="0.00000" iyy="0.00009" iyz="0.00000" izz="0.00018"/>
       <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00003 -0.00005 -0.00035"/>
       <mass value="0.01100"/>
     </inertial>
@@ -113,7 +113,7 @@
       </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.00003" ixy="-0.00002" ixz="-0.00000" iyy="0.00002" iyz="-0.00000" izz="0.00004"/>
+      <inertia ixx="0.00009" ixy="0.00000" ixz="0.00000" iyy="0.00009" iyz="0.00000" izz="0.00018"/>
       <origin rpy="0.00000 0.00000 0.00000" xyz="0.00014 0.00013 0.00035"/>
       <mass value="0.01100"/>
     </inertial>
@@ -133,7 +133,7 @@
       </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.00004" ixy="0.00000" ixz="-0.00000" iyy="0.00001" iyz="0.00000" izz="0.00004"/>
+      <inertia ixx="0.00009" ixy="0.00000" ixz="0.00000" iyy="0.00009" iyz="0.00000" izz="0.00018"/>
       <origin rpy="0.00000 0.00000 0.00000" xyz="0.00004 -0.00061 0.00036"/>
       <mass value="0.01100"/>
     </inertial>

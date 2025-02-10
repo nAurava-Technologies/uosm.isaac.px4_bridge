@@ -13,18 +13,22 @@
 
 #include <usdrt/scenegraph/usd/physxSchema/physxForceAPI.h>
 #include <usdrt/scenegraph/usd/usdPhysics/rigidBodyAPI.h>
+#include <usdrt/scenegraph/usd/physxSchema/physxDeformableAPI.h>
 #include <usdrt/scenegraph/usd/usdPhysics/articulationRootAPI.h>
 #include <usdrt/scenegraph/usd/usdPhysics/revoluteJoint.h>
 
-#include <regex>
-#include <vector>
+#include <algorithm>
+#include <array>
 #include <chrono>
+#include <cmath>
 #include <execution>
 #include <random>
-#include <algorithm>
+#include <regex>
+#include <vector>
 
 #include "xoshiro256ss.h"
 #include <Px4MathUtils.hpp>
+#include <usdrt/gf/vec.h>
 
 namespace uosm {
 namespace isaac {
@@ -55,7 +59,12 @@ public:
         float force_constants = 0.00001211f;    // Force constants
         float max_rotor_velocity = 1032.0f;     // Maximum rotor velocity in rad/s.
         float params_std_dev = 0.05f;           // Standard deviation
-        float time_constants = 0.05f;           // Time constants
+        float rotor_time_constants = 0.05f;     // Time constants
+
+        // servo specs
+        float max_torque = 0.11f; // Maximum torque in kg*m^-1
+        float max_angle = 180.0f; // Maximum angle in degrees
+        float servo_time_constants = 0.2f;     // Time constants
 
         // https://ardupilot.org/copter/docs/airspeed-estimation.html
         usdrt::GfVec3f rotor_drag_coef{0, 0, 0}; // Rotor drag coefficients
@@ -72,32 +81,42 @@ public:
         usdrt::GfVec3f angular_velocity{0, 0, 0}; // deg/s
     };
 
+    struct ActuatorControl
+    {
+        std::array<float, 16> actuator_cmd;
+        std::array<float, 16> actuator_setpoint;
+    };
+
     Px4Multirotor() : parameters()
     {
-        // Max rotor count is 16
         rotor_joint_group.reserve(16);
         rotor_body_group.reserve(16);
+        actuator_joint_group.reserve(6);
+        actuator_body_group.reserve(6);
     }
 
     VehicleParameters &getParameters() { return parameters; }
 
     size_t getRotorCount() const { return rotor_joint_group.size(); }
+    size_t getActuatorCount() const { return actuator_joint_group.size(); }
 
     const void reset(void)
     {
         setVehicleForceAndTorque(usdrt::GfVec3f(0, 0, 0), usdrt::GfVec3f(0, 0, 0));
         std::for_each(rotor_joint_group.begin(), rotor_joint_group.end(), [&](const auto &joint)
-                      {
-                        size_t idx = &joint - &rotor_joint_group[0];
-                        setRotorVelocity(0, static_cast<int>(idx)); });
+                        {
+                    size_t idx = &joint - &rotor_joint_group[0];
+                    setRotorVelocity(0, static_cast<int>(idx)); });
         std::for_each(rotor_body_group.begin(), rotor_body_group.end(), [&](const auto &body)
-                      {
-                        size_t idx = &body - &rotor_body_group[0];
-                        setRotorForce(0, static_cast<int>(idx)); });
+                        {
+                    size_t idx = &body - &rotor_body_group[0];
+                    setRotorForce(0, static_cast<int>(idx)); });
         vehicle_base_link = usdrt::UsdPrim{nullptr};
         vehicle_articulation_root = usdrt::UsdPrim{nullptr};
         rotor_joint_group.clear();
         rotor_body_group.clear();
+        actuator_joint_group.clear();
+        actuator_body_group.clear();
     }
 
     /**
@@ -185,45 +204,61 @@ public:
         torque_axis = moment * getQuatAxis(static_cast<usdrt::GfQuatf>(orient));
     }
 
-    void computeDynamics(const std::vector<float> &actuator_control, std::vector<float> &throttle, std::vector<int> &dir)
+    void computeDynamics(ActuatorControl &m_actuator_control, std::vector<int> &dir)
     {
         std::random_device rd;
         xoshiro256ss rng(rd());
         std::normal_distribution<float> vel_normal_dist(parameters.max_rotor_velocity, parameters.max_rotor_velocity * parameters.params_std_dev);
         std::normal_distribution<float> km_normal_dist(parameters.moment_constants, parameters.moment_constants * parameters.params_std_dev);
         std::normal_distribution<float> kf_normal_dist(parameters.force_constants, parameters.force_constants * parameters.params_std_dev);
-        std::normal_distribution<float> tau_normal_dist(parameters.time_constants, parameters.time_constants * parameters.params_std_dev);
+        std::normal_distribution<float> tau_normal_dist(parameters.rotor_time_constants, parameters.rotor_time_constants * parameters.params_std_dev);
 
-        float omega = vel_normal_dist(rng);
-        float omega_squared = std::pow(omega, 2.0f);
-        std::vector<usdrt::GfVec3f> rotor_torque(actuator_control.size());
-        // Update dynamics with normalized actuator commands (0 to 1) as target_throttle
+        const float omega = vel_normal_dist(rng);
+        const float omega_squared = std::pow(omega, 2.0f);
+        std::vector<usdrt::GfVec3f> rotor_torque(getRotorCount());
+        const int unused_cmd = 16 - getRotorCount() - getActuatorCount();
         std::for_each(std::execution::par,
-                      actuator_control.begin(), actuator_control.end(),
-                      [&](const float &cmd)
-                      {
-                          size_t idx = &cmd - &actuator_control[0];
-                          throttle[idx] += std::clamp(tau_normal_dist(rng), 0.0f, 1.0f) * (std::sqrt(std::abs(cmd)) - throttle[idx]);
-                          float rotor_velocity = dir[idx] * omega * throttle[idx];
-                          if (throttle[idx] > 5 * parameters.params_std_dev)
-                          {
-                              // ignore velocity update if throttle is too small
-                              setRotorVelocity(rotor_velocity, idx);
-                          }
+                        m_actuator_control.actuator_cmd.begin(), m_actuator_control.actuator_cmd.end() - unused_cmd,
+                        [&](const float &cmd)
+                        {
+                            size_t idx = &cmd - &m_actuator_control.actuator_cmd[0];
+                            float tau = std::clamp(tau_normal_dist(rng), 0.0f, 1.0f);
+                            if (idx < getRotorCount())
+                            {
+                                // update for rotors (exponential smoothing)
+                                // current_setpoint = prev_setpoint + tau * (sqrt(|cmd|) - prev_setpoint)
+                                m_actuator_control.actuator_setpoint[idx] += tau * (std::sqrt(std::abs(cmd)) - m_actuator_control.actuator_setpoint[idx]);
+                                float throttle = m_actuator_control.actuator_setpoint[idx];
+                                float rotor_velocity = dir[idx] * omega * throttle;
+                                if (throttle > 5 * parameters.params_std_dev)
+                                {
+                                    // ignore velocity update if throttle is too small
+                                    setRotorVelocity(rotor_velocity, idx);
+                                }
 
-                          float throttle_squared = std::pow(throttle[idx], 2.0f);
-                          float rotor_thrust = throttle_squared * std::abs(kf_normal_dist(rng) * omega_squared);
-                          if (throttle[idx] > 5 * parameters.params_std_dev)
-                          {
-                              // ignore thrust update if throttle is too small
-                              setRotorForce(rotor_thrust, idx);
-                          }
+                                float throttle_squared = std::pow(throttle, 2.0f);
+                                float rotor_thrust = throttle_squared * std::abs(kf_normal_dist(rng) * omega_squared);
+                                if (throttle > 5 * parameters.params_std_dev)
+                                {
+                                    // ignore thrust update if throttle is too small
+                                    setRotorForce(rotor_thrust, idx);
+                                }
 
-                          float rotor_moment = -dir[idx] * throttle_squared * std::abs(km_normal_dist(rng) * omega_squared);
-                          usdrt::GfVec3f torque_axis(0.0f, 0.0f, 0.0f);
-                          getRotorTorqueAxis(rotor_moment, torque_axis, idx);
-                          rotor_torque[idx] = torque_axis;
-                      });
+                                float rotor_moment = -dir[idx] * throttle_squared * std::abs(km_normal_dist(rng) * omega_squared);
+                                usdrt::GfVec3f torque_axis(0.0f, 0.0f, 0.0f);
+                                getRotorTorqueAxis(rotor_moment, torque_axis, idx);
+                                rotor_torque[idx] = torque_axis;
+                            }
+                            else if (idx >= getRotorCount() && idx < getRotorCount() + getActuatorCount())
+                            {
+                                // update for generic actuators (s-curve)
+                                // current_setpoint = lerp(prev_setpoint, target_setpoint, smoothstep)
+                                float smoothstep = parameters.servo_time_constants * parameters.servo_time_constants * (3 - 2 * parameters.servo_time_constants);
+                                m_actuator_control.actuator_setpoint[idx] = lerp(m_actuator_control.actuator_setpoint[idx], parameters.max_angle * cmd, smoothstep);
+                                setActuatorPosition(m_actuator_control.actuator_setpoint[idx], idx - getRotorCount());
+                                setActuatorForce(parameters.max_torque, idx - getRotorCount());
+                            }
+                        });
 
         usdrt::GfVec3f velocity(0.0f, 0.0f, 0.0f);
         getVehicleVelocity(velocity);
@@ -237,7 +272,7 @@ public:
         / The collective thrusts are applied to center of mass of the vehicle and the gravity is already acting on the rigid body.
         / see https://discuss.px4.io/t/wind-estimator-tuning-equation/28053 and https://rpg.ifi.uzh.ch/docs/RAL18_Faessler.pdf
         / Should consider https://docs.omniverse.nvidia.com/extensions/latest/ext_omnigraph/node-library/nodes/omni-physx-forcefields/omni-physx-forcefields-forcefieldwind-1.html?
-        / Global downwash is not taken into account.
+        / Global downwash and equilibrium actuator action acting on main body is not taken into account, assuming negligible.
         */
         usdrt::GfVec3f force_ = body_drag + rotor_drag;
         usdrt::GfVec3f torque_ = std::reduce(rotor_torque.begin(), rotor_torque.end());
@@ -269,6 +304,8 @@ private:
     usdrt::UsdPrim vehicle_articulation_root;
     std::vector<usdrt::UsdPrim> rotor_joint_group;
     std::vector<usdrt::UsdPrim> rotor_body_group;
+    std::vector<usdrt::UsdPrim> actuator_joint_group;
+    std::vector<usdrt::UsdPrim> actuator_body_group;
 
     /**
      * Initializes the vehicle by setting up force API, mass, inertia, and rotor groups.
@@ -280,28 +317,33 @@ private:
     {
         setForceAPI(vehicle_base_link, true);
         setMassAndInertia();
-        setRotorGroup();
+        setRotorActuatorGroup();
 
-        return !rotor_joint_group.empty() && rotor_joint_group.size() == rotor_body_group.size();
+        return !rotor_joint_group.empty() &&
+                rotor_joint_group.size() == rotor_body_group.size() &&
+                actuator_joint_group.size() == actuator_body_group.size();
     }
 
     /**
-     * Populates the rotor joint and body groups by iterating over the children
+     * Populates the rotor/actuator joint and body groups by iterating over the children
      * of both the vehicle base link and vehicle articulation root that matches the
-     * regex pattern and the corresponding USD type (RevoluteJoint / RigidBody)
+     * regex pattern and the corresponding USD type (RevoluteJoint / RigidBody / Deformable)
      */
-    void setRotorGroup(void)
+    void setRotorActuatorGroup(void)
     {
         if (!vehicle_base_link.IsValid() || !vehicle_articulation_root.IsValid())
             return;
 
         rotor_joint_group.clear();
         rotor_body_group.clear();
+        actuator_joint_group.clear();
+        actuator_body_group.clear();
 
-        std::regex pattern("[rR]otor[_]?.*");
+        std::regex rotor_pattern("[rR]otor[_]?.*");
+        std::regex actuator_pattern("[aA]ctuator[_]?.*");
         auto processChild = [&](const usdrt::UsdPrim &child)
         {
-            if (std::regex_match(child.GetName().GetText(), pattern))
+            if (std::regex_match(child.GetName().GetText(), rotor_pattern))
             {
                 if (child.IsA(usdrt::UsdPhysicsRevoluteJoint::_GetStaticTfType()))
                 {
@@ -311,6 +353,23 @@ private:
                 {
                     rotor_body_group.emplace_back(child);
                     setForceAPI(child);
+                }
+            }
+            if (std::regex_match(child.GetName().GetText(), actuator_pattern))
+            {
+                if (child.IsA(usdrt::UsdPhysicsRevoluteJoint::_GetStaticTfType()))
+                {
+                    actuator_joint_group.emplace_back(child);
+                }
+                if (child.HasAPI(usdrt::UsdPhysicsRigidBodyAPI::_GetStaticTfType()))
+                {
+                    actuator_body_group.emplace_back(child);
+                    setForceAPI(child);
+                }
+                if (child.HasAPI(usdrt::PhysxSchemaPhysxDeformableAPI::_GetStaticTfType()))
+                {
+                    // soft body actuator
+                    actuator_body_group.emplace_back(child);
                 }
             }
         };
@@ -417,6 +476,23 @@ private:
 
         usdrt::GfVec3f force(0, 0, thrust);
         rotor_body_group[idx].GetAttribute(usdrt::TfToken("physxForce:force")).Set(force);
+    }
+
+    void setActuatorPosition(const float position, const int idx = 0)
+    {
+        if (actuator_joint_group.empty() || idx < 0 || idx >= static_cast<int>(actuator_joint_group.size()))
+            return;
+
+        actuator_joint_group[idx].GetAttribute(usdrt::TfToken("state:angular:physics:position")).Set(position);
+    }
+
+    void setActuatorForce(const float force, const int idx = 0)
+    {
+        if (actuator_body_group.empty() || idx < 0 || idx >= static_cast<int>(actuator_body_group.size()))
+            return;
+
+        usdrt::GfVec3f applied_force(force, 0, 0);
+        actuator_body_group[idx].GetAttribute(usdrt::TfToken("physxForce:force")).Set(applied_force);
     }
 
     void setVehicleForceAndTorque(const usdrt::GfVec3f &force, const usdrt::GfVec3f &torque, const bool isGlobal = true)

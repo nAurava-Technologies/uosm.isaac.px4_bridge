@@ -118,11 +118,18 @@ static CUDA_CALLABLE Vector3<T> getQuatAxis(const Quat<T> &q, const int axis = 2
     return Vector3<T>(0, 0, 0);
 }
 
-/// Returns scalar value constrained by (min_val, max_val)
+// Returns scalar value constrained by (min_val, max_val)
 template <typename Scalar>
 static inline constexpr const Scalar &constrain(const Scalar &val, const Scalar &min_val, const Scalar &max_val)
 {
     return (val < min_val) ? min_val : ((val > max_val) ? max_val : val);
+}
+
+// Simple lerp implementation for < c++20
+template <typename T>
+static inline T lerp(T a, T b, T t)
+{
+    return a + t * (b - a);
 }
 
 static constexpr float DEG2RAD = M_PI / 180.0f;
