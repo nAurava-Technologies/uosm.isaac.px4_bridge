@@ -1,0 +1,274 @@
+// Copyright 2023 NVIDIA Corporation. All rights reserved.
+//
+// NVIDIA CORPORATION and its licensors retain all intellectual property
+// and proprietary rights in and to this software, related documentation
+// and any modifications thereto.  Any use, reproduction, disclosure or
+// distribution of this software and related documentation without an express
+// license agreement from NVIDIA CORPORATION is strictly prohibited.
+
+mdl 1.7;
+
+import ::anno::*;
+import ::base::*;
+import ::limits::*;
+import ::math::*;
+import ::state::*;
+import ::tex::*;
+
+
+export enum ramp_interpolation_mode
+{
+    catmull_rom = 0,
+    b_spline,
+    ease,
+    linear,
+    constant
+};
+
+float3 catmull_rom_interp(float3 p0, float3 p1, float3 p2, float3 p3, float t)
+{
+    float3 c0 = p1;
+    float3 c1 = 0.5 * (-p0 + p2);
+    float3 c2 = p0 - 2.5 * p1 + 2.0 * p2 - 0.5 * p3;
+    float3 c3 = -0.5 * p0 + 1.5 * p1 - 1.5 * p2 + 0.5 * p3;
+    float t2 = t * t;
+    float t3 = t2 * t;
+
+    return c3 * t3 + c2 * t2 + c1 * t + c0;
+}
+
+float3 b_spline_interp(float3 p0, float3 p1, float3 p2, float3 p3, float t)
+{
+    float t2 = t * t;
+    float t3 = t2 * t;
+    float b0 = (1.0 - 3.0 * t + 3.0 * t2 - t3) / 6.0;
+    float b1 = (4.0 - 6.0 * t2 + 3.0 * t3) / 6.0;
+    float b2 = (1.0 + 3.0 * t + 3.0 * t2 - 3.0 * t3) / 6.0;
+    float b3 = t3 / 6.0;
+
+    return p0 * b0 + p1 * b1 + p2 * b2 + p3 * b3;
+}
+
+float ease_in_out_interp(float t)
+{
+    float ease_in = t * t;
+    float ease_out = 1.0 - ((1.0 - t) * (1.0 - t));
+    return math::lerp(ease_in, ease_out, t);
+}
+
+export color color_ramp
+(
+    uniform color color_1 = color(0.0),
+    uniform float color_1_position = 0.0 [[
+        anno::hard_range(0, 1)
+    ]],
+    uniform color color_2 = color(0.5),
+    uniform float color_2_position = 0.5 [[
+        anno::hard_range(0, 1)
+    ]],
+    uniform color color_3 = color(1.0),
+    uniform float color_3_position = 1.0 [[
+        anno::hard_range(0, 1)
+    ]],
+    uniform color color_4 = color(1.0),
+    uniform float color_4_position = 1.0 [[
+        anno::hard_range(0, 1)
+    ]],
+    uniform color color_5 = color(1.0),
+    uniform float color_5_position = 1.0 [[
+        anno::hard_range(0, 1)
+    ]],
+    uniform color color_6 = color(1.0),
+    uniform float color_6_position = 1.0 [[
+        anno::hard_range(0, 1)
+    ]],
+    uniform color color_7 = color(1.0),
+    uniform float color_7_position = 1.0 [[
+        anno::hard_range(0, 1)
+    ]],
+    uniform color color_8 = color(1.0),
+    uniform float color_8_position = 1.0 [[
+        anno::hard_range(0, 1)
+    ]],
+    uniform ramp_interpolation_mode interpolation_mode = linear,
+    float lookup_position = 0.5
+)
+{
+    color[8] color_keys(color_1, color_2, color_3, color_4, color_5, color_6, color_7, color_8);
+    float[8] color_pos(color_1_position, color_2_position, color_3_position, color_4_position,
+                       color_5_position, color_6_position, color_7_position, color_8_position);
+    float lookup_pos = lookup_position;
+
+    int max_pos_index = 0;
+    for (int i = 1; i <= 7; i++)
+    {
+        if (color_pos[i] > color_pos[max_pos_index])
+        {
+            max_pos_index = i;
+            continue;
+        }
+        break;
+    }
+
+    int lookup_index = 0;
+    for (int i = 0; i <= max_pos_index; i++)
+    {
+        if (color_pos[i] >= lookup_pos)
+        {
+            lookup_index = i;
+            break;
+        }
+    }
+
+    if (color_pos[lookup_index] < lookup_pos)
+        lookup_index = max_pos_index;
+
+
+    color color_key_a, color_key_b;
+    float color_pos_a, color_pos_b;
+    float eval_pos;
+
+    if (lookup_index == 0)
+    {
+        color_key_a = color_keys[0];
+        color_key_b = color_keys[0];
+        color_pos_a = color_pos[0];
+        color_pos_b = color_pos[0];
+        eval_pos = color_pos_b;
+    }
+    else
+    {
+        color_key_a = color_keys[lookup_index - 1];
+        color_key_b = color_keys[lookup_index];
+        color_pos_a = color_pos[lookup_index - 1];
+        color_pos_b = color_pos[lookup_index];
+        eval_pos = (lookup_pos - color_pos_a) / (color_pos_b - color_pos_a);
+    }
+
+    eval_pos = math::clamp(eval_pos, 0.0, 1.0);
+
+
+    color out_color;
+    switch (interpolation_mode)
+    {
+        case catmull_rom:
+        case b_spline:
+            float3 p0, p1, p2, p3;
+
+            if (lookup_index == 0)
+            {
+                p0 = float3(color_keys[0]);
+                p1 = float3(color_keys[0]);
+                p2 = float3(color_keys[1]);
+                p3 = float3(color_keys[1]);
+            }
+            else if (lookup_index == 1)
+            {
+                p0 = float3(color_keys[0]);
+                p1 = float3(color_keys[0]);
+                p2 = float3(color_keys[1]);
+                p3 = float3(color_keys[2]);
+            }
+            else if (lookup_index >= max_pos_index)
+            {
+                p0 = float3(color_keys[max_pos_index - 2]);
+                p1 = float3(color_keys[max_pos_index - 1]);
+                p2 = float3(color_keys[max_pos_index]);
+                p3 = float3(color_keys[max_pos_index]);
+            }
+            else
+            {
+                p0 = float3(color_keys[lookup_index - 2]);
+                p1 = float3(color_keys[lookup_index - 1]);
+                p2 = float3(color_keys[lookup_index]);
+                p3 = float3(color_keys[lookup_index + 1]);
+            }
+
+            switch (interpolation_mode)
+            {
+                case catmull_rom:
+                    out_color = color(catmull_rom_interp(p0, p1, p2, p3, eval_pos));
+                    break;
+                
+                case b_spline:
+                    out_color = color(b_spline_interp(p0, p1, p2, p3, eval_pos));
+                    break;
+
+                default:
+                    break;
+            };
+            break;
+
+        case ease:
+            out_color = math::lerp(color_key_a, color_key_b, ease_in_out_interp(eval_pos));
+            break;
+
+        case linear:
+            out_color = math::lerp(color_key_a, color_key_b, eval_pos);
+            break;
+
+        case constant:
+            out_color = color_key_a;
+            break;
+    }
+
+    return out_color;
+}
+
+export float baked_float_curve(float[<size>] samples, float lookup_position)
+{
+    float t = math::clamp(0.0, 1.0, lookup_position);
+    int idx = int((size - 1) * t);
+
+    float out_float = math::lerp(samples[idx], samples[idx + 1] , t);
+
+    return out_float;
+}
+
+export float baked_float_curve_texture(
+    uniform texture_2d samples_texture,
+    uniform int row = 0,
+    float lookup_position = 0.0)
+{
+    float lookup_pos = math::clamp(lookup_position, 0.0, 1.0);
+    float row_height = 1.0 / tex::height(samples_texture);
+    float row_center = row + (row_height * 0.5);
+
+    float out_float = tex::lookup_float(
+        tex: samples_texture,
+        coord: float2(lookup_pos, row_center),
+        wrap_u: tex::wrap_clamp,
+        wrap_v: tex::wrap_clamp
+    );
+
+    return out_float;
+}
+
+export color baked_color_curve(color[<size>] samples, float lookup_position)
+{
+    float t = math::clamp(0.0, 1.0, lookup_position);
+    int idx = int((size - 1) * t);
+
+    color out_color = math::lerp(samples[idx], samples[idx + 1] , t);
+
+    return out_color;
+}
+
+export color baked_color_curve_texture(
+    uniform texture_2d samples_texture,
+    uniform int row = 0,
+    float lookup_position = 0.0)
+{
+    float lookup_pos = math::clamp(lookup_position, 0.0, 1.0);
+    float row_height = 1.0 / tex::height(samples_texture);
+    float row_center = row + (row_height * 0.5);
+
+    color out_color = tex::lookup_color(
+        tex: samples_texture,
+        coord: float2(lookup_pos, row_center),
+        wrap_u: tex::wrap_clamp,
+        wrap_v: tex::wrap_clamp
+    );
+
+    return out_color;
+}

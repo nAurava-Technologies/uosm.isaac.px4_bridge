@@ -483,6 +483,7 @@ private:
         if (actuator_joint_group.empty() || idx < 0 || idx >= static_cast<int>(actuator_joint_group.size()))
             return;
 
+        // actuator_joint_group[idx].GetAttribute(usdrt::TfToken("drive:angular:physics:targetPosition")).Set(position);
         actuator_joint_group[idx].GetAttribute(usdrt::TfToken("state:angular:physics:position")).Set(position);
     }
 
