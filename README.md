@@ -20,7 +20,15 @@ The project has been tested on **Ubuntu 22.04**.
    The repository includes `.usd` [model](./model/) for a quadcopter platform based on the Holybro S500 development kit equipped with Nvidia Jetson Orin devices.
    Additionally, it is customizable with various [Sensor Assets](https://docs.omniverse.nvidia.com/isaacsim/latest/features/environment_setup/assets/usd_assets_sensors.html) readily available in Isaac Sim.
 
----
+### Other work that uses this repo
+1. Agentic drone with LLM and VLM
+   
+https://github.com/user-attachments/assets/160baeb3-89e4-45ec-bf01-04ba3accba26
+
+2. Aerial Manipulator with DRL
+
+https://github.com/user-attachments/assets/196c0c24-579e-4f58-8b0a-34a71e863f74
+
 
 ## Getting Started
 
