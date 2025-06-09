@@ -21,7 +21,7 @@ The project has been tested on **Ubuntu 22.04**.
    Additionally, it is customizable with various [Sensor Assets](https://docs.omniverse.nvidia.com/isaacsim/latest/features/environment_setup/assets/usd_assets_sensors.html) readily available in Isaac Sim.
 
 ### Other work that uses this repo
-1. Agentic drone with LLM and VLM
+1. [Agentic drone with LLM and VLM](https://github.com/limshoonkit/ros2-px4-agent-ws/)
    
 https://github.com/user-attachments/assets/160baeb3-89e4-45ec-bf01-04ba3accba26
 
