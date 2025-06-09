@@ -11,3 +11,6 @@
 [submodule "example/ros2_offboard_ws/src/px4_ros2_offboard"]
 	path = example/ros2_offboard_ws/src/px4_ros2_offboard
 	url = https://github.com/limshoonkit/px4_ros2_offboard.git
+[submodule "example/ros2-px4-agent-ws"]
+	path = example/ros2-px4-agent-ws
+	url = https://github.com/limshoonkit/ros2-px4-agent-ws/
